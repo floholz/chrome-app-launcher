@@ -12,6 +12,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 
 	"github.com/badgerodon/penv"
@@ -23,8 +24,18 @@ type ChromeConfigRequest struct {
 }
 
 var chromePath string
+var serverPort = 5252
 
 func init() {
+	// check for dev
+	if port := os.Getenv("CALGO_PORT"); port != "" {
+		portInt, err := strconv.ParseInt(port, 10, 32)
+		if err == nil {
+			serverPort = int(portInt)
+		}
+	}
+
+	// find chrome path
 	chromePath = os.Getenv("CALGO_CHROME_PATH")
 	if chromePath != "" {
 		return
@@ -49,13 +60,13 @@ func Start(ctx context.Context) error {
 	r.HandleFunc("/config/{action}", configHandler).Methods("POST")
 
 	server := &http.Server{
-		Addr:    ":5252",
+		Addr:    ":" + strconv.Itoa(serverPort),
 		Handler: r,
 	}
 
 	// Run server in a goroutine
 	go func() {
-		fmt.Println("Server running on http://localhost:5252")
+		fmt.Printf("Server running on http://localhost:%d\n", serverPort)
 		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Fatalf("ListenAndServe error: %v", err)
 		}

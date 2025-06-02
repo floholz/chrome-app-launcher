@@ -4,6 +4,7 @@ go 1.23.3
 
 require (
 	github.com/badgerodon/penv v0.0.0-20151004123538-7a4c6d64fa11
+	github.com/emersion/go-autostart v0.0.0-20250403115856-34830d6457d2
 	github.com/getlantern/systray v1.2.2
 	github.com/gorilla/mux v1.8.1
 )
